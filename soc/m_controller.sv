@@ -2,8 +2,8 @@
 
 module m_controller(
     // CONTROL INPUTS
-    input logic clk, reset,
-    input logic pcpi_valid, // signal to begin process
+    input logic clk, resetn,
+    input logic pcpi_valid, // signal to start process
     // DATA INPUTS
     input logic instruction[31:0], // instruction to analyze
     // CONTROL OUTPUTS
@@ -57,6 +57,7 @@ begin
     // setting registers to previous state
     next_state = state;
 
+    // State machine control
     unique case (state)
         IDLE: begin
             next_state =

@@ -1,10 +1,10 @@
 module m_registers(
     // CONTROL INPUTS
-    input logic clk, reset,
+    input logic clk, resetn,
     //input logic ALU_neg, // whether the result in the ALU is negative. Not needed
-    input logic muxR [`MUX_R_LENGTH-1:0], // multiplexer selection for remainder
-    input logic muxD [`MUX_D_LENGTH-1:0], // multiplexer selection for divisor
-    input logic muxZ [`MUX_Z_LENGTH-1:0], // multiplexer selection for quotient
+    input logic mux_R [`MUX_R_LENGTH-1:0], // multiplexer selection for remainder
+    input logic mux_D [`MUX_D_LENGTH-1:0], // multiplexer selection for divisor
+    input logic mux_Z [`MUX_Z_LENGTH-1:0], // multiplexer selection for quotient
     // DATA INPUTS
     input logic rs1 [31:0], rs2 [31:0], // registers at the input
     input logic sub_result [31:0], // result from the subtractor
@@ -53,25 +53,25 @@ end
 always_comb
 begin
     // Default values are values already saved in registers (redundant to avoid latches)
-    next_R = R;
+    next_R = R:
     next_D = D;
     next_Z = Z;
 
-    unique case (muxR)
+    unique case (mux_R)
         `MUX_R_KEEP:     next_R = R;
         `MUX_R_A:        next_R = rs1;
         `MUX_R_A_NEG:    next_R = -rs1;
         `MUX_R_SUB_KEEP: next_R = is_negative(sub_result) ? R : sub_result;
     endcase
 
-    unique case (muxD)
+    unique case (mux_D)
         `MUX_D_KEEP:  next_D = D;
         `MUX_D_B:     next_D = rs2;
         `MUX_D_B_NEG: next_D = -rs2;
         `MUX_D_SHR:   next_D = {1'b0,D[31:1]};
     endcase
 
-    unique case (next_Z)
+    unique case (mux_Z)
         `MUX_Z_KEEP:    next_Z = Z;
         `MUX_Z_ZERO:    next_Z = '0;
         `MUX_Z_SHL_ADD: begin
