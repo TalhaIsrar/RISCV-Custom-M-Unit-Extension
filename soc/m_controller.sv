@@ -5,15 +5,16 @@ module m_controller(
     input logic clk, resetn,
     input logic pcpi_valid, // signal to start process
     // DATA INPUTS
-    input logic instruction[31:0], // instruction to analyze
+    input logic [31:0] instruction, // instruction to analyze
+    input logic [31:0] rs1, rs2, // operands to analyze
     // CONTROL OUTPUTS
-    output logic mux_R [`MUX_R_LENGTH-1:0], // multiplexer for remainder
-    output logic mux_D [`MUX_D_LENGTH-1:0], // multiplexer for divisor
-    output logic mux_Z [`MUX_Z_LENGTH-1:0], // multiplexer for quocient
-    output logic mux_multA [`MUX_MULTA_LENGTH-1:0], // multiplexer for mult input A
-    output logic mux_multB [`MUX_MULTB_LENGTH-1:0], // multiplexer for mult input B
-    output logic mux_div_rem [`MUX_DIV_REM_LENGTH-1:0], // multiplexer for Z/R selection
-    output logic mux_out [`MUX_OUT_LENGTH-1:0], // multiplexer for output
+    output logic [`MUX_R_LENGTH-1:0] mux_R, // multiplexer for remainder
+    output logic [`MUX_D_LENGTH-1:0] mux_D, // multiplexer for divisor
+    output logic [`MUX_Z_LENGTH-1:0] mux_Z, // multiplexer for quocient
+    output logic [`MUX_MULTA_LENGTH-1:0] mux_multA, // multiplexer for mult input A
+    output logic [`MUX_MULTB_LENGTH-1:0] mux_multB, // multiplexer for mult input B
+    output logic [`MUX_DIV_REM_LENGTH-1:0] mux_div_rem, // multiplexer for Z/R selection
+    output logic [`MUX_OUT_LENGTH-1:0] mux_out, // multiplexer for output
     output logic pcpi_ready,
     output logic pcpi_wr,
     output logic pcpi_busy

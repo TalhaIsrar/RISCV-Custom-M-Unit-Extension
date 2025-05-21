@@ -2,38 +2,38 @@ module riscv_m_unit(
 	input logic clk, 
 	input logic resetn, 
 	
-	input logic valid;
-	input logic[31:0] instruction;
-	input logic[31:0] rs1;
-	input logic[31:0] rs2;
+	input logic valid,
+	input logic[31:0] instruction,
+	input logic[31:0] rs1,
+	input logic[31:0] rs2,
 
-	output logic wr;
-	output logic[31:0] rd;
-	output logic busy;
-	output logic ready;
+	output logic wr,
+	output logic[31:0] rd,
+	output logic busy,
+	output logic ready
 	);
 
 
 //// DATA SIGNALS
 // ALU inputs
-logic R [31:0]; // remainder
-logic D [62:0]; // divisor
-logic Z [31:0]; // quotient
+logic [31:0] R; // remainder
+logic [62:0] D; // divisor
+logic [31:0] Z; // quotient
 // ALU outputs
-logic sub_result [31:0]; // subtraction's result
-logic div_rem [31:0]; // divider's result
-logic div_rem_neg [31:0]; // divider's result inverted
-logic product [63:0]; // multiplier's result
+logic [31:0] sub_result;  // subtraction's result
+logic [31:0] div_rem;     // divider's result
+logic [31:0] div_rem_neg; // divider's result inverted
+logic [63:0] product;     // multiplier's result
 
 
 //// CONTROL SIGNALS
-logic mux_R[`MUX_R_LENGTH-1:0];
-logic mux_D[`MUX_D_LENGTH-1:0];
-logic mux_Z[`MUX_Z_LENGTH-1:0];
-logic mux_multA[`MUX_MULTA_LENGTH-1:0];
-logic mux_multB[`MUX_MULTB_LENGTH-1:0];
-logic mux_div_rem[`MUX_DIV_REM_LENGTH-1:0];
-logic mux_out[`MUX_OUT_LENGTH-1:0];
+logic [`MUX_R_LENGTH-1:0] mux_R;
+logic [`MUX_D_LENGTH-1:0] mux_D;
+logic [`MUX_Z_LENGTH-1:0] mux_Z;
+logic [`MUX_MULTA_LENGTH-1:0] mux_multA;
+logic [`MUX_MULTB_LENGTH-1:0] mux_multB;
+logic [`MUX_DIV_REM_LENGTH-1:0] mux_div_rem;
+logic [`MUX_OUT_LENGTH-1:0] mux_out;
 
 
 //// SUB-BLOCK INSTANTIATION
@@ -41,7 +41,7 @@ logic mux_out[`MUX_OUT_LENGTH-1:0];
 // CONTROLLER
 m_controller controller (
     .clk(clk), .resetn(resetn), .pcpi_valid(valid), // control input
-    .instruction(instruction), // data inputs
+    .instruction(instruction), .rs1(rs1), .rs2(rs2), // data inputs
     .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), .mux_multA(mux_multA), .mux_multB(mux_multB), // control inputs
     .mux_div_rem(mux_div_rem), .mux_out(mux_out), .pcpi_ready(ready), .pcpi_wr(wr), .pcpi_busy(busy) // control inputs
 );

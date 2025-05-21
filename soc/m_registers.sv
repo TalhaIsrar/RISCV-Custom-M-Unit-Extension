@@ -1,39 +1,41 @@
+`include "m_definitions.svh"
+
 module m_registers(
     // CONTROL INPUTS
     input logic clk, resetn,
     //input logic ALU_neg, // whether the result in the ALU is negative. Not needed
-    input logic mux_R [`MUX_R_LENGTH-1:0], // multiplexer selection for remainder
-    input logic mux_D [`MUX_D_LENGTH-1:0], // multiplexer selection for divisor
-    input logic mux_Z [`MUX_Z_LENGTH-1:0], // multiplexer selection for quotient
+    input logic [`MUX_R_LENGTH-1:0] mux_R, // multiplexer selection for remainder
+    input logic [`MUX_D_LENGTH-1:0] mux_D, // multiplexer selection for divisor
+    input logic [`MUX_Z_LENGTH-1:0] mux_Z, // multiplexer selection for quotient
     // DATA INPUTS
-    input logic rs1 [31:0], rs2 [31:0], // registers at the input
-    input logic sub_result [31:0], // result from the subtractor
+    input logic [31:0] rs1, rs2, // registers at the input
+    input logic [31:0] sub_result, // result from the subtractor
     // CONTROL OUTPUTS
     // DATA OUTPUTS
-    output logic R [31:0], // remainder
-    output logic D [62:0], // divisor
-    output logic Z [31:0]  // quotient
+    output logic [31:0] R, // remainder
+    output logic [62:0] D, // divisor
+    output logic [31:0] Z  // quotient
 );
 
 // AUXILIARY FUNCTIONS
 // Function to determine whether a number is negative (MSB bit check)
-function logic is_negative(unsigned value[31:0]);
+function logic is_negative(unsigned [31:0] value);
     return value[31];
 endfunction
 
 
 // REGISTERS
-logic next_R [31:0]; // remainder
-logic next_D [62:0]; // divisor
-logic next_Z [31:0]; // quotient
+logic [31:0] next_R; // remainder
+logic [62:0] next_D; // divisor
+logic [31:0] next_Z; // quotient
 
 
 
 // SEQUENTIAL BLOCK
 // All registers are updated
-always_ff @(posedge clk, posedge reset) // Asynchronous reset
+always_ff @(posedge clk, negedge resetn) // Asynchronous reset
 begin
-    if(reset)
+    if(~resetn)
     begin
         R <= '0;
         D <= '0;
@@ -53,7 +55,7 @@ end
 always_comb
 begin
     // Default values are values already saved in registers (redundant to avoid latches)
-    next_R = R:
+    next_R = R;
     next_D = D;
     next_Z = Z;
 
