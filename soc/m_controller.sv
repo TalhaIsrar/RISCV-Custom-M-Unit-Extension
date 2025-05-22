@@ -27,7 +27,8 @@ logic [4:0] counter;
 logic [4:0] counter_next;
 
 // Internal Signal to store input function
-logic [2:0] current_func;
+logic [2:0] current_func, next_current_func;
+
 
 // CONTROL SIGNALS 
 // STATE
@@ -42,15 +43,17 @@ state_t state, next_state;
 
 
 // SEQUENTIAL BLOCK
-always_ff @(posedge clk, posedge resetn) // Asynchronous reset
+always_ff @(posedge clk, negedge resetn) // Asynchronous reset
 begin
-    if(resetn) begin
+    if(~resetn) begin
         state <= IDLE;
         counter <= 5'b00000;
+        current_func <= '0;
     end
     else begin
         state <= next_state;
         counter <= counter_next;
+        current_func <= next_current_func;
     end
 end
 
@@ -67,6 +70,12 @@ begin
     mux_multB = `MUX_MULTB_ZERO;
     mux_div_rem = `MUX_DIV_REM_R;
     mux_out = `MUX_OUT_ZERO;
+
+    pcpi_ready = '0;
+    pcpi_wr = '0;
+    pcpi_busy = '0;
+    next_current_func = current_func;
+
     
     // setting registers to previous state
     next_state = state;
@@ -87,10 +96,10 @@ begin
             counter_next = 0;
 
             // Get the current func3
-            current_func = get_ir_func3(instruction);
+            next_current_func  = get_ir_func3(instruction);
 
             // Input conditions for valid co-processor instruction
-            if (pcpi_valid && !resetn && (get_ir_opcode(instruction) == OPCODE) 
+            if (pcpi_valid && (get_ir_opcode(instruction) == OPCODE) 
                             && (get_ir_func7(instruction) == FUNC7)) begin            
                 next_state = VALID;
             end else begin
@@ -131,6 +140,8 @@ begin
         end
 
         DIV: begin
+            pcpi_busy = 1'b1;
+
             //  Updating the R, D, Z signals using mux
             mux_R = `MUX_R_SUB_KEEP;
             mux_D = `MUX_D_SHR;
@@ -149,6 +160,8 @@ begin
         end
 
         SELECT: begin
+            pcpi_busy = 1'b1;
+
             // Selection for div or rem mux
             mux_div_rem = is_div(current_func) ? `MUX_DIV_REM_Z : `MUX_DIV_REM_R;
 
@@ -208,7 +221,12 @@ begin
             pcpi_busy = 1'b0;
 
             next_state = IDLE;
+            next_current_func = '0;
         end
+
+        default:
+            next_state = IDLE;
+
     endcase
 
 end

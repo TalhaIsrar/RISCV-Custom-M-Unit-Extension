@@ -1,3 +1,5 @@
+`include "m_definitions.svh"
+
 module riscv_m_unit(
 	input logic clk, 
 	input logic resetn, 
@@ -58,7 +60,7 @@ m_registers registers(
 // ALU
 m_alu alu(
     .clk(clk), .resetn(resetn), .mux_multA(mux_multA), .mux_multB(mux_multB), .mux_div_rem(mux_div_rem), // control inputs
-    .R(R), .D(D), .Z(Z) // data inputs
+    .R(R), .D(D), .Z(Z), // data inputs
     .sub_result(sub_result), .div_rem(div_rem), .div_rem_neg(div_rem_neg), .product(product) // data outputs
 );
 
