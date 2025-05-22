@@ -58,7 +58,7 @@ always_comb begin
         product = {mult_result[65],mult_result[62:0]}; // avoid skipping sign bit
     end
     else begin
-        product = mult_result[63:0]; // Ignore two LSB 
+        product = mult_result[63:0]; // Ignore two MSB 
     end
 end
 

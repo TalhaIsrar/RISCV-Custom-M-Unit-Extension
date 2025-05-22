@@ -44,6 +44,10 @@ function logic is_rem(func3 f3);
     return f3[2]==1 && f3[1]==1;
 endfunction
 
+// Function to determine whether a number is negative (MSB bit check)
+function logic is_negative(unsigned [31:0] value);
+    return value[31];
+endfunction
 
 
 //// CONTROL SIGNALS
