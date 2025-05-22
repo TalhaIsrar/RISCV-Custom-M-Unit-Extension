@@ -27,9 +27,9 @@ logic signed [62:0] sub_a, sub_b;
 // Instantiate subtractor
 assign sub_a = {31'd0,R}; // Add 0 to the left
 assign sub_b = D;
-assign sub_result_sign = $signed(sub_a) - $signed(sub_b); // Perform subtraction
+assign sub_result_sign = sub_a - sub_b; // Perform subtraction
 // concatenation to avoid overwriting bit sign being overwritten
-assign sub_result = {sub_result_sign[62],sub_result_sign[30:0]};
+assign sub_result = sub_result_sign[31:0];
 
 
 //// MULTIPLIER

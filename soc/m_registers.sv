@@ -68,9 +68,9 @@ begin
 
     unique case (mux_D)
         `MUX_D_KEEP:  next_D = D;
-        `MUX_D_B:     next_D = rs2;
-        `MUX_D_B_NEG: next_D = -rs2;
-        `MUX_D_SHR:   next_D = {1'b0,D[31:1]};
+        `MUX_D_B:     next_D = {rs2,31'd0};
+        `MUX_D_B_NEG: next_D = {-rs2,31'd0};
+        `MUX_D_SHR:   next_D = {1'b0,D[62:1]};
     endcase
 
     unique case (mux_Z)
