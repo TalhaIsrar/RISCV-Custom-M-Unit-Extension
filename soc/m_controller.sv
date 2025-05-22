@@ -1,4 +1,4 @@
-`include "m_definitions.h"
+`include "m_definitions.svh"
 
 module m_controller(
     // CONTROL INPUTS
@@ -23,8 +23,8 @@ module m_controller(
 );
 
 // Internal Counter Signal
-reg [4:0] counter;
-reg [4:0] counter_next;
+logic [4:0] counter;
+logic [4:0] counter_next;
 
 // Internal Signal to store input function
 logic [2:0] current_func;
@@ -32,11 +32,11 @@ logic [2:0] current_func;
 // CONTROL SIGNALS 
 // STATE
 typedef enum logic [2:0] {
-    IDLE = 2'b000,
-    VALID = 2'b001,
-    DIV = 2'b010,
-    SELECT = 2'b011,
-    DONE = 2'b100
+    IDLE   = 3'b000,
+    VALID  = 3'b001,
+    DIV    = 3'b010,
+    SELECT = 3'b011,
+    DONE   = 3'b100
 } state_t;
 state_t state, next_state;
 
@@ -87,7 +87,7 @@ begin
             counter_next = 0;
 
             // Get the current func3
-            current_func = get_ir_func3(instruction)
+            current_func = get_ir_func3(instruction);
 
             // Input conditions for valid co-processor instruction
             if (pcpi_valid && !resetn && (get_ir_opcode(instruction) == OPCODE) 
@@ -150,11 +150,11 @@ begin
 
         SELECT: begin
             // Selection for div or rem mux
-            is_div(current_func) ? mux_div_rem = `MUX_DIV_REM_Z : mux_div_rem = `MUX_DIV_REM_R;
+            mux_div_rem = is_div(current_func) ? `MUX_DIV_REM_Z : `MUX_DIV_REM_R;
 
             // Selection for mul mux
             if (is_mult(current_func)) begin
-                unique case(current_func):
+                unique case(current_func)
                     // For MULH both inputs should be signed
                     MULH: begin
                         mux_multA = `MUX_MULTA_R_SIGNED;
