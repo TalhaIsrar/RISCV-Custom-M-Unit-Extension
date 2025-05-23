@@ -17,25 +17,45 @@ module m_controller(
     output logic [`MUX_OUT_LENGTH-1:0] mux_out, // multiplexer for output
     output logic pcpi_ready,
     output logic pcpi_wr,
-    output logic pcpi_busy
+    output logic pcpi_busy,
     // DATA OUTPUTS
-    // none for now
+    output logic [31:0] rs1_neg, rs2_neg
 );
 
-// Internal Counter Signal
+// Internal counter signal
 logic [4:0] counter;
 logic [4:0] counter_next;
 
-// Internal Signal to store input function
+// Internal register to store input function
 logic [2:0] current_func, next_current_func;
 
+// Comparator (subtractor) for input values
+logic rs1_smaller_rs2;
+logic [31:0] abs_rs1, abs_rs2;
+function logic rs1_is_signed(func3 cur_func3);
+    return (cur_func3==MULH || cur_func3==MULHSU || cur_func3==DIV || cur_func3==REM);
+endfunction
+function logic rs2_is_signed(func3 cur_func3);
+    return (cur_func3==MULH || cur_func3==DIV || cur_func3==REM);
+endfunction
+
+// Create neg values for rs1 and rs2
+assign rs1_neg = -rs1;
+assign rs2_neg = -rs2;
+
+always_comb begin
+    abs_rs1[31:0] = (is_negative(rs1) && rs1_is_signed(next_current_func)) ? rs1_neg : rs1;
+    abs_rs2[31:0] = (is_negative(rs2) && rs2_is_signed(next_current_func)) ? rs2_neg : rs2;
+
+    rs1_smaller_rs2 = abs_rs1 < abs_rs2;
+end
 
 // CONTROL SIGNALS 
 // STATE
 typedef enum logic [2:0] {
     IDLE   = 3'b000,
-    VALID  = 3'b001,
-    DIV_ID    = 3'b010,
+    //VALID  = 3'b001,
+    DIVID  = 3'b010,
     SELECT = 3'b011,
     DONE   = 3'b100
 } state_t;
@@ -70,12 +90,10 @@ begin
     mux_multB = `MUX_MULTB_ZERO;
     mux_div_rem = `MUX_DIV_REM_R;
     mux_out = `MUX_OUT_ZERO;
-
     pcpi_ready = '0;
     pcpi_wr = '0;
     pcpi_busy = '0;
     next_current_func = current_func;
-
     
     // setting registers to previous state
     next_state = state;
@@ -98,49 +116,55 @@ begin
             // Input conditions for valid co-processor instruction
             if (pcpi_valid && (get_ir_opcode(instruction) == OPCODE) 
                             && (get_ir_func7(instruction) == FUNC7)) begin            
-                next_state = VALID;
-
+                //next_state = VALID;
                 // Get the current func3
-                next_current_func  = get_ir_func3(instruction);
+                next_current_func = get_ir_func3(instruction);
+
+                // reset quotient mux
+                mux_Z = `MUX_Z_ZERO;
+
+                // Mux selection for signed DIV and REM and negative rs1
+                if ((next_current_func == DIV || next_current_func == REM) 
+                            && is_negative(rs1)) begin
+                    mux_R = `MUX_R_A_NEG;
+                end else begin
+                    mux_R = `MUX_R_A;
+                end
+
+                // Mux selection for signed DIV and REM and negative rs2
+                if ((next_current_func == DIV || next_current_func == REM) 
+                            && is_negative(rs2)) begin
+                    mux_D = `MUX_D_B_NEG;
+                end else begin
+                    mux_D = `MUX_D_B;
+                end
+
+                // Next state logic
+                // Same state for DIV/REM and different for MUL
+                if (is_div(next_current_func) || is_rem(next_current_func)) begin
+                    if (rs1_smaller_rs2) begin
+                        mux_R = `MUX_R_A; // get rs1 to return in case of REM
+                        next_state = DONE;
+                    end else begin
+                        next_state = DIVID;
+                    end
+                end else begin
+                    next_state = SELECT;
+                end
 
             end else begin
                 next_state = IDLE;
             end      
         end
 
-        VALID: begin
+        /*VALID: begin
             // Set busy to 1showing computation is in process
             pcpi_busy = 1'b1;
+            next_state = IDLE;
+            
+        end*/
 
-            // reset quotient mux
-            mux_Z = `MUX_Z_ZERO;
-
-            // Mux selection for signed DIV and REM and negative rs1
-            if ((current_func == DIV || current_func == REM) 
-                        && is_negative(rs1)) begin
-                mux_R = `MUX_R_A_NEG;
-            end else begin
-                mux_R = `MUX_R_A;
-            end
-
-            // Mux selection for signed DIV and REM and negative rs2
-            if ((current_func == DIV || current_func == REM) 
-                        && is_negative(rs2)) begin
-                mux_D = `MUX_D_B_NEG;
-            end else begin
-                mux_D = `MUX_D_B;
-            end
-
-            // Next state logic
-            // Same state for DIV/REM and different for MUL
-            if (is_div(current_func) || is_rem(current_func)) begin
-                next_state = DIV_ID;
-            end else begin
-                next_state = SELECT;
-            end
-        end
-
-        DIV_ID: begin
+        DIVID: begin
             pcpi_busy = 1'b1;
 
             //  Updating the R, D, Z signals using mux
@@ -154,7 +178,7 @@ begin
             // Next state logic
             // If counter is 31, it means we have ran the loop from 0 to 31
             if (counter < 5'b11111) begin
-                next_state = DIV_ID;
+                next_state = DIVID;
             end else begin
                 next_state = SELECT;
             end
@@ -208,11 +232,18 @@ begin
                 // Checking condition of signed DIV or REM and also negative output conditions
                 // Quotient is negative if sign of rs1 is not equal to sign of rs2
                 // Remainder has the same sign as the dividend
+                
+                // Selection for div or rem mux
+                mux_div_rem = is_div(current_func) ? `MUX_DIV_REM_Z : `MUX_DIV_REM_R;
+
                 if ((current_func == DIV && (is_negative(rs1) != is_negative(rs2)))
                         || (current_func == REM && is_negative(rs1))) begin
                     mux_out = `MUX_OUT_DIV_REM_NEG;
                 end else begin
                     mux_out = `MUX_OUT_DIV_REM;
+                end
+                if(rs1_smaller_rs2) begin
+                    mux_out = is_div(current_func) ? `MUX_OUT_ZERO : `MUX_OUT_DIV_REM;
                 end
             end
 
@@ -227,7 +258,6 @@ begin
 
         default:
             next_state = IDLE;
-
     endcase
 
 end

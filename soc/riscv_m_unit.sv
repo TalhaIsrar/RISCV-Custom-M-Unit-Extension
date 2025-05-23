@@ -15,8 +15,9 @@ module riscv_m_unit(
 	output logic ready
 	);
 
-
 //// DATA SIGNALS
+logic [31:0] rs1_neg, rs2_neg;
+
 // ALU inputs
 logic [31:0] R; // remainder
 logic [62:0] D; // divisor
@@ -46,14 +47,15 @@ m_controller controller (
     .clk(clk), .resetn(resetn), .pcpi_valid(valid), // control input
     .instruction(instruction), .rs1(rs1), .rs2(rs2), // data inputs
     .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), .mux_multA(mux_multA), .mux_multB(mux_multB), // control inputs
-    .mux_div_rem(mux_div_rem), .mux_out(mux_out), .pcpi_ready(ready), .pcpi_wr(wr), .pcpi_busy(busy) // control inputs
+    .mux_div_rem(mux_div_rem), .mux_out(mux_out), .pcpi_ready(ready), .pcpi_wr(wr), .pcpi_busy(busy), // control inputs
+    .rs1_neg(rs1_neg), .rs2_neg(rs2_neg) // data outputs
 );
 
 
 // REGISTER FILE
 m_registers registers(
     .clk(clk), .resetn(resetn), .sub_neg(sub_neg), .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), // control inputs
-    .rs1(rs1), .rs2(rs2), .sub_result(sub_result), // data inputs
+    .rs1(rs1), .rs2(rs2), .rs1_neg(rs1_neg), .rs2_neg(rs2_neg), .sub_result(sub_result), // data inputs
     .R(R), .D(D), .Z(Z) // data outputs
 );
 

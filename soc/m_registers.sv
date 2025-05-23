@@ -10,6 +10,7 @@ module m_registers(
     input logic [`MUX_Z_LENGTH-1:0] mux_Z, // multiplexer selection for quotient
     // DATA INPUTS
     input logic [31:0] rs1, rs2, // registers at the input
+    input logic [31:0] rs1_neg, rs2_neg,
     input logic [31:0] sub_result, // result from the subtractor
     // CONTROL OUTPUTS
     // DATA OUTPUTS
@@ -57,14 +58,14 @@ begin
     unique case (mux_R)
         `MUX_R_KEEP:     next_R = R;
         `MUX_R_A:        next_R = rs1;
-        `MUX_R_A_NEG:    next_R = -rs1;
+        `MUX_R_A_NEG:    next_R = rs1_neg;
         `MUX_R_SUB_KEEP: next_R = sub_neg ? R : sub_result;
     endcase
 
     unique case (mux_D)
         `MUX_D_KEEP:  next_D = D;
         `MUX_D_B:     next_D = {rs2,31'd0};
-        `MUX_D_B_NEG: next_D = {-rs2,31'd0};
+        `MUX_D_B_NEG: next_D = {rs2_neg,31'd0};
         `MUX_D_SHR:   next_D = {1'b0,D[62:1]};
     endcase
 
