@@ -103,6 +103,8 @@ endfunction
 `define MUX_OUT_DIV_REM_NEG  `MUX_OUT_LENGTH'd2 // output value from divider multiplied by -1
 `define MUX_OUT_MULT_LOWER   `MUX_OUT_LENGTH'd3 // output lower bits from multipler
 `define MUX_OUT_MULT_UPPER   `MUX_OUT_LENGTH'd4 // output upper bits from multiplier
+`define MUX_OUT_ALL1         `MUX_OUT_LENGTH'd5 // output all bits 1
+`define MUX_OUT_MINUS_1      `MUX_OUT_LENGTH'd6 // output is -1
 
 
 

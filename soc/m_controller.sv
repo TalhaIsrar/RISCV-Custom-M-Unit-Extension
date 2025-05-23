@@ -142,7 +142,10 @@ begin
                 // Next state logic
                 // Same state for DIV/REM and different for MUL
                 if (is_div(next_current_func) || is_rem(next_current_func)) begin
-                    if (rs1_smaller_rs2) begin
+                    if(rs2 == '0) begin
+                        mux_R = `MUX_R_A;
+                        next_state = DONE;
+                    end if (rs1_smaller_rs2) begin
                         mux_R = `MUX_R_A; // get rs1 to return in case of REM
                         next_state = DONE;
                     end else if ((next_current_func == DIV || next_current_func == REM) && rs1 == {-32'd1} && rs2 == {32{1'b1}}) begin
@@ -246,7 +249,15 @@ begin
                 end
 
                 // Evaluate especial cases
-                if(rs1_smaller_rs2) begin
+                if (rs2 == '0) begin // division by 0 cases
+                    if(is_rem(current_func)) begin
+                        mux_out = `MUX_OUT_DIV_REM;
+                    end else if (current_func == DIV) begin
+                        mux_out = `MUX_OUT_MINUS_1;
+                    end else if (current_func == DIVU) begin
+                        mux_out = `MUX_OUT_ALL1;
+                    end
+                end else if(rs1_smaller_rs2) begin
                     mux_out = is_div(current_func) ? `MUX_OUT_ZERO : `MUX_OUT_DIV_REM;
                 end else if (rs1 == {-32'd1} && rs2 == {32{1'b1}}) begin // Overflow
                     if (current_func == DIV) begin
