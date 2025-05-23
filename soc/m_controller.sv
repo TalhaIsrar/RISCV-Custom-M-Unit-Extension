@@ -35,7 +35,7 @@ logic [2:0] current_func, next_current_func;
 typedef enum logic [2:0] {
     IDLE   = 3'b000,
     VALID  = 3'b001,
-    DIV    = 3'b010,
+    DIV_ID    = 3'b010,
     SELECT = 3'b011,
     DONE   = 3'b100
 } state_t;
@@ -95,13 +95,14 @@ begin
             // Reset the counter
             counter_next = 0;
 
-            // Get the current func3
-            next_current_func  = get_ir_func3(instruction);
-
             // Input conditions for valid co-processor instruction
             if (pcpi_valid && (get_ir_opcode(instruction) == OPCODE) 
                             && (get_ir_func7(instruction) == FUNC7)) begin            
                 next_state = VALID;
+
+                // Get the current func3
+                next_current_func  = get_ir_func3(instruction);
+
             end else begin
                 next_state = IDLE;
             end      
@@ -133,13 +134,13 @@ begin
             // Next state logic
             // Same state for DIV/REM and different for MUL
             if (is_div(current_func) || is_rem(current_func)) begin
-                next_state = DIV;
+                next_state = DIV_ID;
             end else begin
                 next_state = SELECT;
             end
         end
 
-        DIV: begin
+        DIV_ID: begin
             pcpi_busy = 1'b1;
 
             //  Updating the R, D, Z signals using mux
@@ -153,7 +154,7 @@ begin
             // Next state logic
             // If counter is 31, it means we have ran the loop from 0 to 31
             if (counter < 5'b11111) begin
-                next_state = DIV;
+                next_state = DIV_ID;
             end else begin
                 next_state = SELECT;
             end

@@ -22,7 +22,7 @@ logic [31:0] R; // remainder
 logic [62:0] D; // divisor
 logic [31:0] Z; // quotient
 // ALU outputs
-logic [31:0] sub_result;  // subtraction's result
+logic [62:0] sub_result;  // subtraction's result
 logic [31:0] div_rem;     // divider's result
 logic [31:0] div_rem_neg; // divider's result inverted
 logic [63:0] product;     // multiplier's result

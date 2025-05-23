@@ -12,7 +12,7 @@ module m_alu(
     input logic [31:0] Z, // quotient
     // CONTROL OUTPUTS
     // DATA OUTPUTS
-    output logic [31:0] sub_result,
+    output logic [62:0] sub_result,
     output logic [31:0] div_rem,
     output logic [31:0] div_rem_neg,
     output logic [63:0] product
@@ -29,7 +29,7 @@ assign sub_a = {31'd0,R}; // Add 0 to the left
 assign sub_b = D;
 assign sub_result_sign = sub_a - sub_b; // Perform subtraction
 // concatenation to avoid overwriting bit sign being overwritten
-assign sub_result = sub_result_sign[31:0];
+assign sub_result = sub_result_sign[62:0];
 
 
 //// MULTIPLIER
