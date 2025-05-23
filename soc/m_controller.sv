@@ -145,6 +145,8 @@ begin
                     if (rs1_smaller_rs2) begin
                         mux_R = `MUX_R_A; // get rs1 to return in case of REM
                         next_state = DONE;
+                    end else if ((next_current_func == DIV || next_current_func == REM) && rs1 == {-32'd1} && rs2 == {32{1'b1}}) begin
+                        next_state = DONE;
                     end else begin
                         next_state = DIVID;
                     end
@@ -242,8 +244,16 @@ begin
                 end else begin
                     mux_out = `MUX_OUT_DIV_REM;
                 end
+
+                // Evaluate especial cases
                 if(rs1_smaller_rs2) begin
                     mux_out = is_div(current_func) ? `MUX_OUT_ZERO : `MUX_OUT_DIV_REM;
+                end else if (rs1 == {-32'd1} && rs2 == {32{1'b1}}) begin // Overflow
+                    if (current_func == DIV) begin
+                        mux_out = `MUX_OUT_DIV_REM;
+                    end else if (current_func == REM) begin
+                        mux_out = `MUX_OUT_ZERO;
+                    end
                 end
             end
 
