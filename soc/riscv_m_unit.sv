@@ -22,7 +22,8 @@ logic [31:0] R; // remainder
 logic [62:0] D; // divisor
 logic [31:0] Z; // quotient
 // ALU outputs
-logic [62:0] sub_result;  // subtraction's result
+logic sub_neg;
+logic [31:0] sub_result;  // subtraction's result
 logic [31:0] div_rem;     // divider's result
 logic [31:0] div_rem_neg; // divider's result inverted
 logic [63:0] product;     // multiplier's result
@@ -51,7 +52,7 @@ m_controller controller (
 
 // REGISTER FILE
 m_registers registers(
-    .clk(clk), .resetn(resetn), .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), // control inputs
+    .clk(clk), .resetn(resetn), .sub_neg(sub_neg), .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), // control inputs
     .rs1(rs1), .rs2(rs2), .sub_result(sub_result), // data inputs
     .R(R), .D(D), .Z(Z) // data outputs
 );
@@ -61,6 +62,7 @@ m_registers registers(
 m_alu alu(
     .clk(clk), .resetn(resetn), .mux_multA(mux_multA), .mux_multB(mux_multB), .mux_div_rem(mux_div_rem), // control inputs
     .R(R), .D(D), .Z(Z), // data inputs
+    .sub_neg(sub_neg), // control outputs
     .sub_result(sub_result), .div_rem(div_rem), .div_rem_neg(div_rem_neg), .product(product) // data outputs
 );
 

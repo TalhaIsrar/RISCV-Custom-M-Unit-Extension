@@ -12,6 +12,7 @@ logic [`MUX_Z_LENGTH-1:0] mux_Z; // multiplexer selection for quotient
 logic [31:0] rs1, rs2; // registers at the input
 logic [31:0] sub_result; // result from the subtractor
 // CONTROL OUTPUTS
+logic sub_neg;
 // DATA OUTPUTS
 logic [31:0] R; // remainder
 logic [62:0] D; // divisor
@@ -23,6 +24,8 @@ logic [31:0] D_lower, D_upper;
 assign D_lower = D[31:0];
 assign D_upper = D[62:31];
 logic [31:0] test_Z;
+
+assign sub_neg = sub_result[31];
 
 initial begin
     clk = '0;

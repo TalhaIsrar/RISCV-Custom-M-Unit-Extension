@@ -16,6 +16,7 @@ logic [31:0] sub_result;  // subtraction's result
 logic [31:0] div_rem;     // divider's result
 logic [31:0] div_rem_neg; // divider's result inverted
 logic [63:0] product;     // multiplier's result
+logic sub_neg;
 
 logic [31:0] D_lower, D_upper;
 assign D_lower = D[31:0];
