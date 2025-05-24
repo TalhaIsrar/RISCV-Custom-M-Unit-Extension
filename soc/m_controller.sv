@@ -148,13 +148,14 @@ begin
                     end if (rs1_smaller_rs2) begin
                         mux_R = `MUX_R_A; // get rs1 to return in case of REM
                         next_state = DONE;
+                    // Overflow
                     end else if ((next_current_func == DIV || next_current_func == REM) && rs1 == {-32'd1} && rs2 == {32{1'b1}}) begin
                         next_state = DONE;
                     end else begin
                         next_state = DIVID;
                     end
-                end else begin
-                    next_state = SELECT;
+                end else begin // Multiplier
+                    next_state = DONE;
                 end
 
             end else begin
@@ -195,29 +196,7 @@ begin
             // Selection for div or rem mux
             mux_div_rem = is_div(current_func) ? `MUX_DIV_REM_Z : `MUX_DIV_REM_R;
 
-            // Selection for mul mux
-            if (is_mult(current_func)) begin
-                unique case(current_func)
-                    // For MULH both inputs should be signed
-                    MULH: begin
-                        mux_multA = `MUX_MULTA_R_SIGNED;
-                        mux_multB = `MUX_MULTB_D_SIGNED;
-                    end
             
-                    // For MULHSU first input is signed and second unsigned
-                    MULHSU: begin
-                        mux_multA = `MUX_MULTA_R_SIGNED;
-                        mux_multB = `MUX_MULTB_D_UNSIGNED;
-                    end
-
-                    // For MUL & MULHU both inputs are unsigned
-                    default: begin
-                        mux_multA = `MUX_MULTA_R_UNSIGNED;
-                        mux_multB = `MUX_MULTB_D_UNSIGNED;
-                    end
-                endcase
-            end
-
             next_state = DONE;
         end
 
@@ -225,6 +204,29 @@ begin
             // Output mux logic
             // Check if it is multiplication
             if (is_mult(current_func)) begin
+                // Selection for mul mux
+                if (is_mult(current_func)) begin
+                    unique case(current_func)
+                        // For MULH both inputs should be signed
+                        MULH: begin
+                            mux_multA = `MUX_MULTA_R_SIGNED;
+                            mux_multB = `MUX_MULTB_D_SIGNED;
+                        end
+                
+                        // For MULHSU first input is signed and second unsigned
+                        MULHSU: begin
+                            mux_multA = `MUX_MULTA_R_SIGNED;
+                            mux_multB = `MUX_MULTB_D_UNSIGNED;
+                        end
+
+                        // For MUL & MULHU both inputs are unsigned
+                        default: begin
+                            mux_multA = `MUX_MULTA_R_UNSIGNED;
+                            mux_multB = `MUX_MULTB_D_UNSIGNED;
+                        end
+                    endcase
+                end
+
                 // If function is MUL then we use lower bits otherwise upper bits
                 if (current_func == MUL) begin
                     mux_out = `MUX_OUT_MULT_LOWER;
