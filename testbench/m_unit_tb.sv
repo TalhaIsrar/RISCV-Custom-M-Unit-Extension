@@ -111,6 +111,7 @@ module m_unit_tb;
         // REM
         test(REM, 32'hFFFFFFF3, 32'h00000005, 32'hFFFFFFFD); // REM -13 % 5 = -3
         test(REM, 32'h00000005, 32'hFFFFFFF3, 32'h00000005); // REM 5 % -13 = 5
+        test(REM, 32'hFFFFFF30, 32'h00003001, 32'hFFFFFF30); // REM hFFFFFF30 % h3001 = hFFFFFF30
         test(REM, 32'hFFFFFFF3, 32'h00000000, 32'hFFFFFFF3); // REM -13 % 0 = -13             DIV BY 0
         test(REM, 32'h80000000, 32'hFFFFFFFF, 32'h00000000); // REM h80000000 / -1 = 0        Overflow
 
@@ -118,6 +119,7 @@ module m_unit_tb;
         // REMU
         test(REMU, 32'h0000000D, 32'h00000005, 32'h00000003); // REMU 13 % 5 = 3
         test(REMU, 32'h00000005, 32'h0000000D, 32'h00000005); // REMU 5 % 13 = 5
+        test(REMU, 32'h00003000, 32'h00003001, 32'h00003000); // REMU h3000 % h3001 = h3000
         test(REMU, 32'h0000000D, 32'h00000000, 32'h0000000D); // REMU 13 % 0 = 13              DIV BY 0
 
 	$stop;

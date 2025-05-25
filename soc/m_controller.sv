@@ -44,8 +44,8 @@ assign rs1_neg = -rs1;
 assign rs2_neg = -rs2;
 
 always_comb begin
-    abs_rs1[31:0] = (is_negative(rs1) && rs1_is_signed(next_current_func)) ? rs1_neg : rs1;
-    abs_rs2[31:0] = (is_negative(rs2) && rs2_is_signed(next_current_func)) ? rs2_neg : rs2;
+    abs_rs1[31:0] = (is_negative(rs1) && rs1_is_signed((state == DONE) ? current_func : next_current_func)) ? rs1_neg : rs1;
+    abs_rs2[31:0] = (is_negative(rs2) && rs2_is_signed((state == DONE) ? current_func : next_current_func)) ? rs2_neg : rs2;
 
     rs1_smaller_rs2 = abs_rs1 < abs_rs2;
 end
