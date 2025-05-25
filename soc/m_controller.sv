@@ -39,17 +39,6 @@ function logic rs2_is_signed(func3 cur_func3);
     return (cur_func3==MULH || cur_func3==DIV || cur_func3==REM);
 endfunction
 
-// Create neg values for rs1 and rs2
-assign rs1_neg = -rs1;
-assign rs2_neg = -rs2;
-
-always_comb begin
-    abs_rs1[31:0] = (is_negative(rs1) && rs1_is_signed((state == DONE) ? current_func : next_current_func)) ? rs1_neg : rs1;
-    abs_rs2[31:0] = (is_negative(rs2) && rs2_is_signed((state == DONE) ? current_func : next_current_func)) ? rs2_neg : rs2;
-
-    rs1_smaller_rs2 = abs_rs1 < abs_rs2;
-end
-
 // CONTROL SIGNALS 
 // STATE
 typedef enum logic [2:0] {
@@ -62,6 +51,18 @@ typedef enum logic [2:0] {
     MULTIP = 3'b110
 } state_t;
 state_t state, next_state;
+
+
+// Create neg values for rs1 and rs2
+assign rs1_neg = -rs1;
+assign rs2_neg = -rs2;
+
+always_comb begin
+    abs_rs1[31:0] = (is_negative(rs1) && rs1_is_signed((state == DONE) ? current_func : next_current_func)) ? rs1_neg : rs1;
+    abs_rs2[31:0] = (is_negative(rs2) && rs2_is_signed((state == DONE) ? current_func : next_current_func)) ? rs2_neg : rs2;
+
+    rs1_smaller_rs2 = abs_rs1 < abs_rs2;
+end
 
 
 // SEQUENTIAL BLOCK
@@ -96,6 +97,7 @@ begin
     pcpi_wr = '0;
     pcpi_busy = '0;
     next_current_func = current_func;
+    counter_next = '0;
     
     // setting registers to previous state
     next_state = state;
@@ -113,7 +115,7 @@ begin
             mux_multB = `MUX_MULTB_ZERO;
 
             // Reset the counter
-            counter_next = 0;
+            counter_next = '0;
 
             // Input conditions for valid co-processor instruction
             if (pcpi_valid && (get_ir_opcode(instruction) == OPCODE) 
@@ -180,13 +182,12 @@ begin
             mux_D = `MUX_D_SHR;
             mux_Z = `MUX_Z_SHL_ADD;
 
-            // Incrementing the counter
-            counter_next = counter + 5'b00001;
-
             // Next state logic
             // If counter is 31, it means we have ran the loop from 0 to 31
             if (counter < 5'b11111) begin
                 next_state = DIVID;
+                // Incrementing the counter
+                counter_next = counter + 5'b00001;
             end else begin
                 next_state = SELECT;
             end

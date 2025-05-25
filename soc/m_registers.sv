@@ -35,7 +35,7 @@ logic signed [32:0] next_mult_a, next_mult_b; // operands of multiplication
 
 // SEQUENTIAL BLOCK
 // All registers are updated
-always_ff @(posedge clk, negedge resetn) // Asynchronous reset
+always_ff @(posedge clk) // Synchronous reset, match registers inside DSP
 begin
     if(~resetn)
     begin

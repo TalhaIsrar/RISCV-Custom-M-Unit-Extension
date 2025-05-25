@@ -2,9 +2,9 @@
 
 module m_alu(
     // CONTROL INPUTS
-    input logic clk, resetn,
-    input logic [`MUX_MULTA_LENGTH-1:0]   mux_multA,
-    input logic [`MUX_MULTB_LENGTH-1:0]   mux_multB,
+    //input logic clk, resetn,
+    //input logic [`MUX_MULTA_LENGTH-1:0]   mux_multA,
+    //input logic [`MUX_MULTB_LENGTH-1:0]   mux_multB,
     input logic [`MUX_DIV_REM_LENGTH-1:0] mux_div_rem,
     // DATA INPUTS
     input logic [31:0] R, // remainder
