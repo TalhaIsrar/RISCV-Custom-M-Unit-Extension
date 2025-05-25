@@ -75,11 +75,13 @@ module m_unit_tb;
         // MUL (lower bits)
         test(MUL, 32'h1111FFFF, 32'h1111FFFF, 32'hDDDC0001); // MUL 1111FFFF * 1111FFFF = 01236543DDDC0001
         test(MUL, 32'hFFFFFFFF, 32'hFFFFFFFF, 32'h00000001); // MUL 4294967295 * 4294967295 = 18446744065119617025
+        test(MUL, 32'h00000002, 32'hFFFFFFFF, 32'hFFFFFFFE); // MULH 2 * -1 = -1
 
         $display("Testing MULH");
         // MULH (upper bits)
         test(MULH, 32'hFFFFFFFB, 32'hFFFFFFFC, 32'h00000000); // MULH -5 * -4 = 20 // MSB 32 Bits 0
         test(MULH, 32'hFFFFFFFF, 32'hFFFFFFFF, 32'h00000000); // MULH -1 * -1 = 1
+        test(MULH, 32'h00000002, 32'hFFFFFFFF, 32'hFFFFFFFF); // MULH 2 * -1 = -1
 
         $display("Testing MULHSU");
         // MULHSU (upper bits)

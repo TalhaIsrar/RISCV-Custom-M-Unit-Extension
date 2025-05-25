@@ -12,6 +12,7 @@ module m_registers(
     input logic [31:0] rs1, rs2, // registers at the input
     input logic [31:0] rs1_neg, rs2_neg,
     input logic [31:0] sub_result, // result from the subtractor
+    input logic [63:0] product,
     // CONTROL OUTPUTS
     // DATA OUTPUTS
     output logic [31:0] R, // remainder
@@ -56,11 +57,12 @@ begin
     next_Z = Z;
 
     unique case (mux_R)
-        `MUX_R_KEEP:     next_R = R;
-        `MUX_R_A:        next_R = rs1;
-        `MUX_R_A_NEG:    next_R = rs1_neg;
-        `MUX_R_SUB_KEEP: next_R = sub_neg ? R : sub_result;
-    endcase
+        `MUX_R_KEEP:       next_R = R;
+        `MUX_R_A:          next_R = rs1;
+        `MUX_R_A_NEG:      next_R = rs1_neg;
+        `MUX_R_SUB_KEEP:   next_R = sub_neg ? R : sub_result;
+        `MUX_R_MULT_LOWER: next_R = product[31:0];
+    endcase;
 
     unique case (mux_D)
         `MUX_D_KEEP:  next_D = D;
@@ -76,6 +78,7 @@ begin
             next_Z[31:1] = Z[30:0];
             next_Z[0]    = sub_neg ? 1'b0 : 1'b1;
         end
+        `MUX_Z_MULT_UPPER: next_Z = product[63:32];
     endcase
 end
 

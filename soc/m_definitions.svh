@@ -53,12 +53,13 @@ endfunction
 //// CONTROL SIGNALS
 
 // Multiplexer for R register
-`define MUX_R_LENGTH 2 // number of bits needed to declare mux R
+`define MUX_R_LENGTH 3 // number of bits needed to declare mux R
 // Values
-`define MUX_R_KEEP     `MUX_R_LENGTH'd0 // keep previous value
-`define MUX_R_A        `MUX_R_LENGTH'd1 // copy value from input
-`define MUX_R_A_NEG    `MUX_R_LENGTH'd2 // copy value from input and multiply it by -1
-`define MUX_R_SUB_KEEP `MUX_R_LENGTH'd3 // replace by value obtained in subtractor or keep it (depends on ALU result)
+`define MUX_R_KEEP       `MUX_R_LENGTH'd0 // keep previous value
+`define MUX_R_A          `MUX_R_LENGTH'd1 // copy value from input
+`define MUX_R_A_NEG      `MUX_R_LENGTH'd2 // copy value from input and multiply it by -1
+`define MUX_R_SUB_KEEP   `MUX_R_LENGTH'd3 // replace by value obtained in subtractor or keep it (depends on ALU result)
+`define MUX_R_MULT_LOWER `MUX_R_LENGTH'd4 // replace by lower 32 bits from multiplier
 
 // Multiplexer for D register
 `define MUX_D_LENGTH 2 // number of bits needed to declare mux D
@@ -71,9 +72,10 @@ endfunction
 // Multiplexer for Z register
 `define MUX_Z_LENGTH 2 // number of bits needed to declare mux Z
 // Values
-`define MUX_Z_KEEP    `MUX_Z_LENGTH'd0 // keep previous value
-`define MUX_Z_ZERO    `MUX_Z_LENGTH'd1 // replace by 0
-`define MUX_Z_SHL_ADD `MUX_Z_LENGTH'd2 // replace value by obtained in left shift (and adds 1 depending on ALU result)
+`define MUX_Z_KEEP       `MUX_Z_LENGTH'd0 // keep previous value
+`define MUX_Z_ZERO       `MUX_Z_LENGTH'd1 // replace by 0
+`define MUX_Z_SHL_ADD    `MUX_Z_LENGTH'd2 // replace value by obtained in left shift (and adds 1 depending on ALU result)
+`define MUX_Z_MULT_UPPER `MUX_Z_LENGTH'd3 // replace by upper 32 bits from multiplier
 
 // Multiplexer for multA input
 `define MUX_MULTA_LENGTH 2 // number of bits needed to declare mux multA

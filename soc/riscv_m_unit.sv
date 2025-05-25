@@ -55,7 +55,7 @@ m_controller controller (
 // REGISTER FILE
 m_registers registers(
     .clk(clk), .resetn(resetn), .sub_neg(sub_neg), .mux_R(mux_R), .mux_D(mux_D), .mux_Z(mux_Z), // control inputs
-    .rs1(rs1), .rs2(rs2), .rs1_neg(rs1_neg), .rs2_neg(rs2_neg), .sub_result(sub_result), // data inputs
+    .rs1(rs1), .rs2(rs2), .rs1_neg(rs1_neg), .rs2_neg(rs2_neg), .sub_result(sub_result), .product(product), // data inputs
     .R(R), .D(D), .Z(Z) // data outputs
 );
 
