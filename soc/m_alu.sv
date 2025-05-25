@@ -10,13 +10,15 @@ module m_alu(
     input logic [31:0] R, // remainder
     input logic [62:0] D, // divisor
     input logic [31:0] Z, // quotient
+    input logic signed [32:0] mult_a,
+    input logic signed [32:0] mult_b,
     // CONTROL OUTPUTS
     output logic sub_neg,
     // DATA OUTPUTS
     output logic [31:0] sub_result,
     output logic [31:0] div_rem,
     output logic [31:0] div_rem_neg,
-    output logic [63:0] product
+    output logic signed [65:0] product
 );
 
 
@@ -34,36 +36,13 @@ assign sub_result = sub_result_sign[31:0];
 assign sub_neg = sub_result_sign[62];
 
 
+
 //// MULTIPLIER
-// Auxiliary signed values to instantiate signed multiplier
-logic signed [65:0] mult_result;
-logic signed [32:0] mult_a, mult_b;
 
 // Instantiate multiplier
 always_comb begin
-    mult_a[31:0] = R;
-    mult_b[31:0] = D[62:31];
-    unique case (mux_multA)
-        `MUX_MULTA_R_UNSIGNED: mult_a[32] = 1'b0;  // add 0 to the left
-        `MUX_MULTA_R_SIGNED  : mult_a[32] = R[31]; // extend bit sign
-        `MUX_MULTA_ZERO      : mult_a     = 33'd0; // make it 0
-    endcase
-    unique case (mux_multB)
-        `MUX_MULTB_D_UNSIGNED: mult_b[32] = 1'b0;  // add 0 to the left
-        `MUX_MULTB_D_SIGNED  : mult_b[32] = D[62]; // extend bit sign
-        `MUX_MULTB_ZERO      : mult_b     = 33'd0; // make it 0
-    endcase
-    mult_result = $signed(mult_a) * $signed(mult_b); // Perform multiplication
-
-    // Pass result onto output
-    if (mux_multA == `MUX_MULTA_R_SIGNED || mux_multB == `MUX_MULTB_D_SIGNED) begin
-        product = {mult_result[65],mult_result[62:0]}; // avoid skipping sign bit
-    end
-    else begin
-        product = mult_result[63:0]; // Ignore two MSB 
-    end
+    product = mult_a * mult_b; // Perform multiplication
 end
-
 
 //// DIVISION/REMAINDER SELECTION
 always_comb begin

@@ -57,7 +57,9 @@ typedef enum logic [2:0] {
     //VALID  = 3'b001,
     DIVID  = 3'b010,
     SELECT = 3'b011,
-    DONE   = 3'b100
+    DONE   = 3'b100,
+    PRE_MULT = 3'b101,
+    MULTIP = 3'b110
 } state_t;
 state_t state, next_state;
 
@@ -217,15 +219,26 @@ begin
                         mux_multB = `MUX_MULTB_D_UNSIGNED;
                     end
                 endcase
-                if (current_func == MUL) begin
-                    mux_R = `MUX_R_MULT_LOWER;
-                    mux_div_rem = `MUX_DIV_REM_R;
-                end else begin
-                    mux_Z = `MUX_Z_MULT_UPPER;
-                    mux_div_rem = `MUX_DIV_REM_Z;
-                end
+                next_state = PRE_MULT;
+            end else begin
+                next_state = DONE;
             end
+        end
 
+        PRE_MULT: begin
+            pcpi_busy = 1'b1;
+            next_state = MULTIP;
+        end
+
+        MULTIP: begin
+            pcpi_busy = 1'b1;
+            if (current_func == MUL) begin
+                mux_R = `MUX_R_MULT_LOWER;
+                mux_div_rem = `MUX_DIV_REM_R;
+            end else begin
+                mux_Z = `MUX_Z_MULT_UPPER;
+                mux_div_rem = `MUX_DIV_REM_Z;
+            end
             next_state = DONE;
         end
 
