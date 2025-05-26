@@ -149,7 +149,7 @@ begin
                     if(rs2 == '0) begin
                         mux_R = `MUX_R_A;
                         next_state = DONE;
-                    end if (rs1_smaller_rs2) begin
+                    end else if (rs1_smaller_rs2) begin
                         mux_R = `MUX_R_A; // get rs1 to return in case of REM
                         next_state = DONE;
                     // Overflow
