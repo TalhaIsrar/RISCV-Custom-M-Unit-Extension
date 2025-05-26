@@ -24,8 +24,8 @@ module m_alu(
 
 //// SUBTRACTOR (FOR DIVISION)
 // Auxiliary signed values to instantiate signed subtractor
-logic signed [62:0] sub_result_sign;
-logic signed [62:0] sub_a, sub_b;
+logic signed [63:0] sub_result_sign;
+logic [62:0] sub_a, sub_b;
 
 // Instantiate subtractor
 assign sub_a = {31'd0,R}; // Add 0 to the left
@@ -33,7 +33,7 @@ assign sub_b = D;
 assign sub_result_sign = sub_a - sub_b; // Perform subtraction
 // concatenation to avoid overwriting bit sign being overwritten
 assign sub_result = sub_result_sign[31:0];
-assign sub_neg = sub_result_sign[62];
+assign sub_neg = sub_result_sign[63];
 
 
 

@@ -100,12 +100,19 @@ module m_unit_tb;
         test(DIV, 32'hFFFFFFF3, 32'h00000000, 32'hFFFFFFFF); // DIV -13 / 0 = -1              DIV BY 0
         test(DIV, 32'h00000005, 32'h00000000, 32'hFFFFFFFF); // DIV   5 / 0 = -1              DIV BY 0
         test(DIV, 32'h80000000, 32'hFFFFFFFF, 32'h80000000); // DIV h80000000 / -1 = 80000000 Overflow
+        test(DIV, 32'd34, 32'd23, 32'd1);
+        test(DIV, -32'd34, 32'd23, -32'd1);
+        test(DIV, 32'd34, -32'd23, -32'd1);
+        test(DIV, -32'd34, -32'd23, 32'd1);
 
         $display("Testing DIVU");
         // DIVU
         test(DIVU, 32'h0000000D, 32'h00000005, 32'h00000002); // DIVU 13 / 5 = 2
         test(DIVU, 32'h00000005, 32'h0000000D, 32'h00000000); // DIVU 5 / 13 = 0
         test(DIVU, 32'h0000000D, 32'h00000000, 32'hFFFFFFFF); // DIVU 13 / 0 = MAX             DIV BY 0
+        test(DIVU, 32'd34, 32'd23, 32'd1);
+        test(DIVU, '0, 32'd74, '0);
+        test(DIVU, 32'hFFFFFFFF, '0, 32'hFFFFFFFF);
 
         $display("Testing REM");
         // REM
