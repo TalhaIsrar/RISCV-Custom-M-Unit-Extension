@@ -81,11 +81,14 @@ Two testbenches were developed for this project:
 
 ---
 
-## Future Improvements
+## Timing Analysis
 
-* Implement pipelining for multiplication.
-* Optimize division loop for early termination.
-* Integrate support for RV64M.
+| Parameter                    | Value    |
+| ---------------------------- | -------- |
+| **Clock Frequency**          | 100 MHz  |
+| **Setup Slack (WNS)**        | 1.088 ns |
+| **Hold Slack (WHS)**         | 0.137 ns |
+| **Pulse Width Slack (WPWS)** | 4.5 ns   |
 
 ---
 
