@@ -20,7 +20,7 @@ The control path is governed by a finite state machine (FSM) with the following 
 * **SELECT**: Select the correct register to put into output.
 * **DONE**: Signals the main core the completion of the multiplication/division.
 
-![Controller FSM](imgs/controller.jpg)
+![Controller FSM](imgs/controller.png)
 
 ### 🧮 Data Path
 
@@ -30,7 +30,7 @@ The data path consists of:
 * An **ALU** for performing arithmetic operations.
 * A control signal `sub_reg` from the ALU to the register file to manage operand routing.
 
-![Datapath](imgs/datapath.jpg)
+![Datapath](imgs/datapath.png)
 
 ---
 
