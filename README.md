@@ -48,6 +48,66 @@ The data path consists of:
 
 ---
 
+### 32-Bit Signed/Unsigned Division Algorithm
+The code uses an optimized version of the algorithm presented below:
+
+**Inputs:**
+- `A`, `B`: 32-bit signed/unsigned integers
+- `FUNC3`: 3-bit control signal (determines `DIV` or `REM` operation)
+
+**Outputs:**
+- `Z`: Quotient (32-bit signed/unsigned integer)
+- `R`: Remainder (32-bit signed/unsigned integer)
+
+The algorithm ensures:  
+> **A = Z × B + R**
+
+---
+
+```pseudocode
+begin
+    if (FUNC3 == DIV or FUNC3 == REM) then
+        signA ← A[31]
+        signB ← B[31]
+
+        if (signA) then
+            A ← ~A + 1     // Convert to absolute value
+        end if
+
+        if (signB) then
+            B ← ~B + 1     // Convert to absolute value
+        end if
+    end if
+
+    R ← A
+    B ← {0, B, ZERO_31}    // Left shift B by 31 bits (align divisor)
+    Z ← 0
+
+    for i = 0 to 31 do
+        Z ← Z << 1
+        if (R - B ≥ 0) then
+            Z ← Z + 1
+            R ← R - B
+        end if
+        B ← B >> 1
+    end for
+
+    if (FUNC3 == DIV or FUNC3 == REM) then
+        if (signA XOR signB) then
+            Z ← ~Z + 1     // Apply sign to quotient
+        end if
+        if (signA) then
+            R ← ~R + 1     // Apply sign to remainder
+        end if
+    end if
+
+    return Z, R
+end
+
+```
+
+---
+
 ## Testbenches
 
 Two testbenches were developed for this project:
