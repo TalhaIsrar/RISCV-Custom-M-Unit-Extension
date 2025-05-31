@@ -10,6 +10,20 @@ This project implements the **M extension** of the RISC-V instruction set as a *
 
 ## Architecture
 
+### Signal Interface Description
+
+| Signal   | Direction | Width   | Description                                                                                                                                               |
+|----------|-----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `valid`  | Input     | 1 bit   | Set by the processor when an unknown instruction is discovered. `insn`, `rs1`, and `rs2` are assigned at the same time.                                  |
+| `insn`   | Input     | 32 bits | Holds the unknown instruction; assigned simultaneously with `valid`.                                                                                      |
+| `rs1`    | Input     | 32 bits | Holds the value of register `rs1` from the instruction `insn`.                                                                                            |
+| `rs2`    | Input     | 32 bits | Holds the value of register `rs2` from the instruction `insn`.                                                                                            |
+| `ready`  | Output    | 1 bit   | Set by the co-processor to signal that instruction execution is complete and outputs are ready. High for **only one clock cycle**, otherwise causes error. |
+| `wr`     | Output    | 1 bit   | Set by the co-processor simultaneously with `ready` if the instruction has a result to return.                                                           |
+| `rd`     | Output    | 32 bits | Holds the result value when `wr` is set.                                                                                                                  |
+| `busy`   | Output    | 1 bit   | Indicates instruction is being processed. If neither `ready` nor `busy` is high within 16 cycles of `valid`, the processor treats it as illegal.         |
+
+
 ### 🔧 Control Path
 
 The control path is governed by a finite state machine (FSM) with the following states:
